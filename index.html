@@ -6,7 +6,41 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>123</h1>
-    <iframe src="https://s-yoshiki.github.io/Gasyori100knockJS/#/questions/ans1/iframe" style="width:100%;height:300px;"></iframe>
+    <canvas id="canvas"></canvas>
+    <script>
+        // canvas関連のオブジェクト
+        const canvas = document.getElementById("canvas")
+        const ctx = canvas.getContext("2d")
+
+        // 任意の画像読み込み
+        let image = new Image()
+        image.src = "path/to/image.png"
+
+        // 読み込み完了時のイベント
+        image.onload = () => {
+            canvas.width = image.width
+            canvas.height = image.height
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
+            // canvas描画後、画像の処理を実行
+        }
+        let src = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        let dst = ctx.createImageData(canvas.width, canvas.height)
+        for (let i = 0; i < src.data.length; i += 4) {
+            dst.data[i] = src.data[i]          // r
+            dst.data[i + 1] = src.data[i + 1]  // g
+            dst.data[i + 2] = src.data[i + 2]  // b
+            dst.data[i + 3] = src.data[i + 3]  // a (透過度)
+        }
+        const grayscale = (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b
+        // 略
+        for (let i = 0; i < src.data.length; i += 4) {
+            let gray = grayscale(src.data[i], src.data[i + 1], src.data[i + 2])
+            dst.data[i] = gray[0]
+            dst.data[i + 1] = gray[1]
+            dst.data[i + 2] = gray[2]
+            dst.data[i + 3] = src.data[i + 3]
+        }
+        ctx.putImageData(dst, 0, 0)
+    </script>
 </body>
 </html>
